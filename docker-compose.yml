@@ -13,7 +13,7 @@ x-variables:
  - &DB_PREFIX '_piwigo'
  - &PWG_ADMIN_USERNAME 'admin'
  - &PWG_ADMIN_PASSWORD 'password'
- - &PWG_ADMIN_EMAIL 'noreply@domain.tld'
+ - &PWG_ADMIN_MAIL 'noreply@domain.tld'
 
 x-template: &default-template
   environment:
