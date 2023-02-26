@@ -4,7 +4,7 @@ set -eu
 
 source=${1:-webdevops}
 target=${2:-kipjr}
-version=${3:-8.2}
+version=${3:-8.1}
 pwgversion=${4:-13.6}
 arch=$(uname -m)
 root=$PWD
@@ -45,13 +45,13 @@ docker build  -f Dockerfile -t "${target}/toolbox" . | tee -a ./dockerbuild.log
 
 #php alpine
 cd "$root"
-cd "$root"/base/docker/php/8.2-alpine && \
+cd "$root"/base/docker/php/${version}-alpine && \
 ArchCheck Dockerfile
 # sed "s@$source@${target}@g" -i Dockerfile && \
 sed "s@$source\/toolbox@${target}\/toolbox@g" -i Dockerfile && \
-sed "s@$source\/php:8.2-alpine@${target}\/php:8.2-alpine@g" -i Dockerfile && \
+sed "s@$source\/php:${version}-alpine@${target}\/php:${version}-alpine@g" -i Dockerfile && \
 sed "s@sockets@#sockets@g" -i Dockerfile && \
-docker build  -f Dockerfile -t "${target}/php:8.2-alpine" . | tee -a ./dockerbuild.log
+docker build  -f Dockerfile -t "${target}/php:${version}-alpine" . | tee -a ./dockerbuild.log
 
 #php alpine apache
 cd "$root"
