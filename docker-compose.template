@@ -65,7 +65,7 @@ services:
     depends_on:
       - piwigo.db
     ports:
-      - 80:80
+      - 7080:80
     restart: "unless-stopped"
     environment:
       TZ: "Europe/Amsterdam"
@@ -94,7 +94,7 @@ services:
       PMA_USER: root
       PMA_PASSWORD: *DB_ROOT_PASSWORD
     ports:
-      - "9501:80"
+      - "7081:80"
     restart: "unless-stopped"
     networks:
       - net
@@ -111,7 +111,7 @@ services:
     profiles:
       - debug
     ports:
-      - 7002:80
+      - 7082:80
     restart: "unless-stopped"      
     networks:
       - net
