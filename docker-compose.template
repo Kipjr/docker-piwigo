@@ -36,9 +36,10 @@ services:
     container_name: piwigo.ldap
     hostname: ldap
     image: "osixia/openldap:latest"
-    volumes:
-      - ldapdata:/var/lib/ldap
     restart: "unless-stopped"
+    volumes:
+      - ldapdata:/var/lib/ldap # Error: the config directory (/etc/ldap/slapd.d) is empty but not the database directory (/var/lib/ldap)
+      - ldapconfig:/etc/ldap/slapd.d 
     environment:
       TZ: "Europe/Amsterdam"
       LDAP_TLS: "False"
@@ -120,6 +121,8 @@ volumes:
   dbdata:
     driver: local
   pwgdata:
+    driver: local
+  ldapconfig:
     driver: local
   ldapdata:
     driver: local

@@ -11,12 +11,12 @@ root=$PWD
 
 echo "$source $target $arch"
 
-if [ -d ./base ]; then
-  rm -rf ./base
+#if [ -d ./base ]; then
+ # rm -rf ./base
   #cd src && git pull -f
 #else
 #  git clone https://github.com/$source/Dockerfile.git base
-fi
+#fi
 
 git clone https://github.com/vslcatena/docker-web-base.git base
 
@@ -41,7 +41,7 @@ cd "$root"/base/docker/toolbox/latest && \
 
 sed "s@$source\/toolbox@${target}\/toolbox@g" -i Dockerfile && \
 ArchCheck Dockerfile
-docker build  -f Dockerfile -t "${target}/toolbox" . | tee -a ./dockerbuild.log
+docker build  -f Dockerfile -t "${target}/toolbox" . | tee -a $root/dockerbuild.log
 
 #php alpine
 cd "$root"
@@ -51,7 +51,7 @@ ArchCheck Dockerfile
 sed "s@$source\/toolbox@${target}\/toolbox@g" -i Dockerfile && \
 sed "s@$source\/php:${version}-alpine@${target}\/php:${version}-alpine@g" -i Dockerfile && \
 sed "s@sockets@#sockets@g" -i Dockerfile && \
-docker build  -f Dockerfile -t "${target}/php:${version}-alpine" . | tee -a ./dockerbuild.log
+docker build  -f Dockerfile -t "${target}/php:${version}-alpine" . | tee -a $root/dockerbuild.log
 
 #php alpine apache
 cd "$root"
@@ -60,7 +60,7 @@ ArchCheck Dockerfile
 # sed "s@$source@${target}@g" -i Dockerfile && \
 sed "s@$source\/php-apache:${version}@${target}\/php-apache:${version}@g" -i Dockerfile && \
 sed "s@$source\/php:${version}-alpine@${target}\/php:${version}-alpine@g" -i Dockerfile && \
-docker build  -f Dockerfile -t "${target}/php-apache:${version}" . | tee -a ./dockerbuild.log
+docker build  -f Dockerfile -t "${target}/php-apache:${version}" . | tee -a $root/dockerbuild.log
 
 # base php-apache image
 cd "$root"/src
@@ -68,7 +68,7 @@ cd "$root"/src
 docker tag ${target}/php-apache:${version} ghcr.io/${target}/docker-piwigo:php-apache-${version}
 
 ## build image with piwigo inside
-docker build -f Dockerfile -t "ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}" . | tee -a ./dockerbuild.log
+docker build -f Dockerfile --build-arg phpversion=${version} -t "ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}" . | tee -a $root/dockerbuild.log
 
 ######
 #
@@ -80,7 +80,7 @@ docker build -f Dockerfile -t "ghcr.io/${target}/docker-piwigo:php-apache-${vers
 # docker push ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}
 #
 
-
+cd "$root"
 ###
 ### Prepare docker-compose.yml
 ###
