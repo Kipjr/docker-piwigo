@@ -59,7 +59,7 @@ services:
   piwigo.php:
     container_name: piwigo.php
     hostname: php
-    image: ghcr.io/kipjr/docker-piwigo:php-apache-8.2-13.6
+    image: ghcr.io/kipjr/docker-piwigo:php-apache-${__TEMPLATE__VERSION}-${__TEMPLATE__PWGVERSION}
     build:
       context: .
       dockerfile: Dockerfile   

@@ -92,10 +92,15 @@ __TEMPLATE__PASSWORD1=$(GetRandom)
 __TEMPLATE__PASSWORD2=$(GetRandom)
 __TEMPLATE__PASSWORD3=$(GetRandom)
 __TEMPLATE__PASSWORD4=$(GetRandom)
+__TEMPLATE_VERSION=version
+__TEMPLATE_PWGVERSION=pwgversion
+
 declare -x __TEMPLATE__PASSWORD1
 declare -x __TEMPLATE__PASSWORD2
 declare -x __TEMPLATE__PASSWORD3
 declare -x __TEMPLATE__PASSWORD4
+declare -x __TEMPLATE__VERSION
+declare -x __TEMPLATE__PWGVERSION
 
 envsubst < docker-compose.template > docker-compose.yml
 
