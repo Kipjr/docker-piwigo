@@ -1,0 +1,133 @@
+x-variables:
+  - &DB_HOST "db"
+  - &DB_ROOT_PASSWORD "$__TEMPLATE__PASSWORD1"
+  - &DB_DATABASE "pwg"
+  - &DB_USERNAME "pwg"
+  - &DB_PASSWORD "pwg"
+  - &DB_PREFIX "pwg_"
+  - &PWG_ADMIN_USERNAME "admin"
+  - &PWG_ADMIN_PASSWORD "$__TEMPLATE__PASSWORD2"
+  - &PWG_ADMIN_MAIL "noreply@domain.tld"
+  - &LDAP_HOST "ldap"
+  - &LDAP_DOMAIN "domain.tld"
+  - &LDAP_ADMIN_PASSWORD "$__TEMPLATE__PASSWORD3"
+  - &LDAP_CONFIG_PASSWORD "$__TEMPLATE__PASSWORD4"
+  - &LDAP_BASE_DN "dc=domain, dc=tld"
+
+services:
+  #MySQL Service
+  piwigo.db:
+    container_name: piwigo.db
+    hostname: db
+    image: "yobasystems/alpine-mariadb:latest"
+    environment:
+      TZ: "Europe/Amsterdam"
+      MYSQL_ROOT_PASSWORD: *DB_ROOT_PASSWORD
+      MYSQL_DATABASE: *DB_DATABASE
+      MYSQL_USER: *DB_USERNAME
+      MYSQL_PASSWORD: *DB_PASSWORD
+    volumes:
+      - dbdata:/var/lib/mysql/ # allows you to stop and restart the db service without losing data
+    restart: "unless-stopped"
+    networks:
+      - net
+
+  piwigo.ldap:
+    container_name: piwigo.ldap
+    hostname: ldap
+    image: "osixia/openldap:latest"
+    volumes:
+      - ldapdata:/var/lib/ldap
+    restart: "unless-stopped"
+    environment:
+      TZ: "Europe/Amsterdam"
+      LDAP_TLS: "False"
+      LDAP_LOG_LEVEL: 256
+      KEEP_EXISTING_CONFIG: "True"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "False"
+      LDAP_DOMAIN: *LDAP_DOMAIN
+      LDAP_ADMIN_PASSWORD: *LDAP_ADMIN_PASSWORD
+      LDAP_CONFIG_PASSWORD: *LDAP_ADMIN_PASSWORD
+      LDAP_BASE_DN: *LDAP_BASE_DN
+      LDAP_RFC2307BIS_SCHEMA: "True"
+    command: --loglevel debug
+    networks:
+      - net
+
+  #PHP Service
+  piwigo.php:
+    container_name: piwigo.php
+    hostname: php
+    image: ghcr.io/kipjr/docker-piwigo:php-apache-8.2-13.6
+    build:
+      context: .
+      dockerfile: Dockerfile   
+    depends_on:
+      - piwigo.db
+    ports:
+      - 80:80
+    restart: "unless-stopped"
+    environment:
+      TZ: "Europe/Amsterdam"
+      PWG_DB_HOST: *DB_HOST
+      PWG_DB_BASE: *DB_DATABASE
+      PWG_DB_USER: *DB_USERNAME
+      PWG_DB_PASSWORD: *DB_PASSWORD
+      PWG_DB_PREFIX: *DB_PREFIX
+      PWG_ADMIN_USERNAME: *PWG_ADMIN_USERNAME
+      PWG_ADMIN_PASSWORD: *PWG_ADMIN_PASSWORD
+      PWG_ADMIN_EMAIL: *PWG_ADMIN_MAIL
+    volumes:
+      - pwgdata:/app
+    networks:
+      - net
+
+  #phpmyadmin
+  piwigo.pma:
+    container_name: piwigo.pma
+    hostname: pma
+    image: ghcr.io/linuxserver/phpmyadmin
+    profiles:
+      - debug
+    environment:
+      PMA_HOST: *DB_HOST
+      PMA_USER: root
+      PMA_PASSWORD: *DB_ROOT_PASSWORD
+    ports:
+      - "9501:80"
+    restart: "unless-stopped"
+    networks:
+      - net
+
+  #phpldapadmin
+  piwigo.pla:
+    container_name: piwigo.pla
+    hostname: piwigo.pla
+    image: "osixia/phpldapadmin:latest"
+    environment:
+      TZ: "Europe/Amsterdam"
+      PHPLDAPADMIN_LDAP_HOSTS: *LDAP_HOST
+      PHPLDAPADMIN_HTTPS: "false"
+    profiles:
+      - debug
+    ports:
+      - 7002:80
+    restart: "unless-stopped"      
+    networks:
+      - net
+
+volumes:
+  dbdata:
+    driver: local
+  pwgdata:
+    driver: local
+  ldapdata:
+    driver: local
+
+networks:
+  net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.8.56/29 #192.168.8.57 - 192.168.8.62(bc:63)

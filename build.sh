@@ -4,6 +4,8 @@ set -eu
 
 source=${1:-webdevops}
 target=${2:-kipjr}
+version=${3:-8.2}
+pwgversion=${4:-13.6}
 arch=$(uname -m)
 root=$PWD
 
@@ -34,7 +36,7 @@ function ArchCheck () {
 #toolbox
 cd "$root"
 cd "$root"/base/docker/toolbox/latest && \
-# $source/php:8.0-alpine
+# $source/php:${version}-alpine
 # sed "s@$source@${target}@g" -i Dockerfile && \
 
 sed "s@$source\/toolbox@${target}\/toolbox@g" -i Dockerfile && \
@@ -43,22 +45,58 @@ docker build  -f Dockerfile -t "${target}/toolbox" . | tee -a ./dockerbuild.log
 
 #php alpine
 cd "$root"
-cd "$root"/base/docker/php/8.0-alpine && \
+cd "$root"/base/docker/php/8.2-alpine && \
 ArchCheck Dockerfile
 # sed "s@$source@${target}@g" -i Dockerfile && \
 sed "s@$source\/toolbox@${target}\/toolbox@g" -i Dockerfile && \
-sed "s@$source\/php:8.0-alpine@${target}\/php:8.0-alpine@g" -i Dockerfile && \
+sed "s@$source\/php:8.2-alpine@${target}\/php:8.2-alpine@g" -i Dockerfile && \
 sed "s@sockets@#sockets@g" -i Dockerfile && \
-docker build  -f Dockerfile -t "${target}/php:8.0-alpine" . | tee -a ./dockerbuild.log
+docker build  -f Dockerfile -t "${target}/php:8.2-alpine" . | tee -a ./dockerbuild.log
 
 #php alpine apache
 cd "$root"
-cd "$root"/base/docker/php-apache/8.0-alpine && \
+cd "$root"/base/docker/php-apache/${version}-alpine && \
 ArchCheck Dockerfile
 # sed "s@$source@${target}@g" -i Dockerfile && \
-sed "s@$source\/php-apache:8.0@${target}\/php-apache:8.0@g" -i Dockerfile && \
-sed "s@$source\/php:8.0-alpine@${target}\/php:8.0-alpine@g" -i Dockerfile && \
-docker build  -f Dockerfile -t "${target}/php-apache:8.0" . | tee -a ./dockerbuild.log
+sed "s@$source\/php-apache:${version}@${target}\/php-apache:${version}@g" -i Dockerfile && \
+sed "s@$source\/php:${version}-alpine@${target}\/php:${version}-alpine@g" -i Dockerfile && \
+docker build  -f Dockerfile -t "${target}/php-apache:${version}" . | tee -a ./dockerbuild.log
 
-cd "$root"
+# base php-apache image
+cd "$root"/src
+# rename to follow naming convention
+docker tag ${target}/php-apache:${version} ghcr.io/${target}/docker-piwigo:php-apache-${version}
+
+## build image with piwigo inside
+docker build -f Dockerfile -t "ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}" . | tee -a ./dockerbuild.log
+
+######
+#
+# Update Github package
+#
+######
+# docker login -u <username> -p {[token](https://github.com/settings/tokens)} ghcr.io
+# docker push ghcr.io/${target}/docker-piwigo:php-apache-${version}
+# docker push ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}
+#
+
+
+###
+### Prepare docker-compose.yml
+###
+function GetRandom(){
+    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1
+}
+
+__TEMPLATE__PASSWORD1=$(GetRandom)
+__TEMPLATE__PASSWORD2=$(GetRandom)
+__TEMPLATE__PASSWORD3=$(GetRandom)
+__TEMPLATE__PASSWORD4=$(GetRandom)
+declare -x __TEMPLATE__PASSWORD1
+declare -x __TEMPLATE__PASSWORD2
+declare -x __TEMPLATE__PASSWORD3
+declare -x __TEMPLATE__PASSWORD4
+
+envsubst < docker-compose.template > docker-compose.yml
+
 #docker-compose up -d
