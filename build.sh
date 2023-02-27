@@ -88,17 +88,17 @@ function GetRandom(){
     cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1
 }
 
-__TEMPLATE__PASSWORD1=$(GetRandom)
-__TEMPLATE__PASSWORD2=$(GetRandom)
-__TEMPLATE__PASSWORD3=$(GetRandom)
-__TEMPLATE__PASSWORD4=$(GetRandom)
-__TEMPLATE_VERSION=version
-__TEMPLATE_PWGVERSION=pwgversion
+__TEMPLATE_VERSION=$version
+__TEMPLATE_PWGVERSION=$pwgversion
+__TEMPLATE__DB_ROOT_PASSWORD=$(GetRandom)
+__TEMPLATE__PWG_ADMIN_PASSWORD=$(GetRandom)
+__TEMPLATE_LDAP_ADMIN_PASSWORD=$(GetRandom)
+__TEMPLATE__LDAP_CONFIG_PASSWORD=$(GetRandom)
 
-declare -x __TEMPLATE__PASSWORD1
-declare -x __TEMPLATE__PASSWORD2
-declare -x __TEMPLATE__PASSWORD3
-declare -x __TEMPLATE__PASSWORD4
+declare -x __TEMPLATE__DB_ROOT_PASSWORD
+declare -x __TEMPLATE__PWG_ADMIN_PASSWORD
+declare -x __TEMPLATE_LDAP_ADMIN_PASSWORD
+declare -x __TEMPLATE__LDAP_CONFIG_PASSWORD
 declare -x __TEMPLATE__VERSION
 declare -x __TEMPLATE__PWGVERSION
 
