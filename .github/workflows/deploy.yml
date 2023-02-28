@@ -1,0 +1,26 @@
+name: Deploy
+on:
+  # push:
+  #  branches:
+  #    - dev
+  # schedule:
+  #   - cron: '0 6 * * 6' # every 30 minutes
+  workflow_dispatch: # on button click
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    environment: actions-ci
+    steps:
+      - uses: actions/checkout@v3
+      - name: Start build script
+        run: ./build.sh
+      - name: Build image
+        run: |
+           docker-compose build piwigo.php
+      - name: Rename image
+        run: |
+           docker tag kipjr/php-apache:8.1-13.6
+ghcr.io/kipjr/docker-piwigo:php-apache-8.1-13.6
+
+
