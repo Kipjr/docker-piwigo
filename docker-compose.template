@@ -62,7 +62,7 @@ services:
     pull_policy: always
     image: ghcr.io/kipjr/docker-piwigo:php-apache-$__TEMPLATE__VERSION-$__TEMPLATE__PWGVERSION
     build:
-      context: .
+      context: src
       dockerfile: Dockerfile   
     depends_on:
       - piwigo.db
