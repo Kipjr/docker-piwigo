@@ -15,12 +15,12 @@ jobs:
       - uses: actions/checkout@v3
       - name: Start build script
         run: ./build.sh
+        shell: bash
       - name: Build image
         run: |
            docker-compose build piwigo.php
       - name: Rename image
         run: |
-           docker tag kipjr/php-apache:8.1-13.6
-ghcr.io/kipjr/docker-piwigo:php-apache-8.1-13.6
+           docker tag kipjr/php-apache:8.1-13.6 ghcr.io/kipjr/docker-piwigo:php-apache-8.1-13.6
 
 
