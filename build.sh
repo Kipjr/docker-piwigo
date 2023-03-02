@@ -2,10 +2,11 @@
 
 set -eu
 
-source=${1:-webdevops}
-target=${2:-kipjr}
-version=${3:-8.1}
-pwgversion=${4:-13.6}
+
+version=${1:-8.1}
+pwgversion=${2:-13.6}
+target=${3:-kipjr}
+source=${4:-webdevops}
 arch=$(uname -m)
 root=$PWD
 
