@@ -14,6 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Start build script
+        env:
+          __TEMPLATE__VERSION: ${{ vars.__TEMPLATE__VERSION }}
+          __TEMPLATE__PWGVERSION: ${{ vars.__TEMPLATE__PWGVERSION }}
         run: ./build.sh
         shell: bash
       - name: Login to GitHub Container Registry
@@ -22,6 +25,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.PKG_WRITE }}
-      - name: Build image
+      - name: Push image
         run: |
-           docker build -f Dockerfile --build-arg phpversion=${version} -t "ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}" .
+           docker push -t "ghcr.io/kipjr/docker-piwigo:php-apache-${__TEMPLATE__VERSION}"
+           docker push -t "ghcr.io/kipjr/docker-piwigo:php-apache-${__TEMPLATE__VERSION}-${__TEMPLATE__PWGVERSION}" 
+
