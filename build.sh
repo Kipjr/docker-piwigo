@@ -80,28 +80,3 @@ docker build -f Dockerfile --build-arg phpversion=${version} -t "ghcr.io/${targe
 # docker push ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}
 #
 
-cd "$root"
-###
-### Prepare docker-compose.yml
-###
-function GetRandom(){
-    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1
-}
-
-__TEMPLATE_VERSION=$version
-__TEMPLATE_PWGVERSION=$pwgversion
-__TEMPLATE__DB_ROOT_PASSWORD=$(GetRandom)
-__TEMPLATE__PWG_ADMIN_PASSWORD=$(GetRandom)
-__TEMPLATE_LDAP_ADMIN_PASSWORD=$(GetRandom)
-__TEMPLATE__LDAP_CONFIG_PASSWORD=$(GetRandom)
-
-declare -x __TEMPLATE__DB_ROOT_PASSWORD
-declare -x __TEMPLATE__PWG_ADMIN_PASSWORD
-declare -x __TEMPLATE_LDAP_ADMIN_PASSWORD
-declare -x __TEMPLATE__LDAP_CONFIG_PASSWORD
-declare -x __TEMPLATE__VERSION
-declare -x __TEMPLATE__PWGVERSION
-
-envsubst < docker-compose.template > docker-compose.yml
-
-#docker-compose up -d
