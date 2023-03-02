@@ -18,9 +18,4 @@ jobs:
         shell: bash
       - name: Build image
         run: |
-           docker-compose build piwigo.php
-      - name: Rename image
-        run: |
-           docker tag kipjr/php-apache:8.1-13.6 ghcr.io/kipjr/docker-piwigo:php-apache-8.1-13.6
-
-
+           docker build -f Dockerfile --build-arg phpversion=${version} -t "ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}" .
