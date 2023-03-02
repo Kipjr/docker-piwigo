@@ -11,12 +11,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: actions-ci
+    env:
+      __TEMPLATE__VERSION: ${{ vars.__TEMPLATE__VERSION }}
+      __TEMPLATE__PWGVERSION: ${{ vars.__TEMPLATE__PWGVERSION }}
     steps:
       - uses: actions/checkout@v3
       - name: Start build script
-        env:
-          __TEMPLATE__VERSION: ${{ vars.__TEMPLATE__VERSION }}
-          __TEMPLATE__PWGVERSION: ${{ vars.__TEMPLATE__PWGVERSION }}
         run: ./build.sh
         shell: bash
       - name: Login to GitHub Container Registry
@@ -27,6 +27,6 @@ jobs:
           password: ${{ secrets.PKG_WRITE }}
       - name: Push image
         run: |
-           docker push -t "ghcr.io/kipjr/docker-piwigo:php-apache-${__TEMPLATE__VERSION}"
-           docker push -t "ghcr.io/kipjr/docker-piwigo:php-apache-${__TEMPLATE__VERSION}-${__TEMPLATE__PWGVERSION}" 
+           docker push "ghcr.io/kipjr/docker-piwigo:php-apache-${__TEMPLATE__VERSION}"
+           docker push "ghcr.io/kipjr/docker-piwigo:php-apache-${__TEMPLATE__VERSION}-${__TEMPLATE__PWGVERSION}" 
 
