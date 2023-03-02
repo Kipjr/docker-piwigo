@@ -8,7 +8,7 @@ on:
   workflow_dispatch: # on button click
 
 jobs:
-  tests:
+  deploy:
     runs-on: ubuntu-latest
     environment: actions-ci
     steps:
@@ -16,8 +16,6 @@ jobs:
       - name: Start build script
         run: ./build.sh
         shell: bash
-      - name: GitTools
-        uses: GitTools/actions@v0.9.15
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
