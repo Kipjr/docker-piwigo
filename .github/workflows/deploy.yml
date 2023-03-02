@@ -5,15 +5,26 @@ on:
   #    - dev
   # schedule:
   #   - cron: '0 6 * * 6' # every 30 minutes
-  workflow_dispatch: # on button click
+  workflow_dispatch:
+    inputs:
+      version_php:
+        description: 'PHP Version'
+        required: true
+        default: '8.1'
+        type: string
+      version_piwigo:
+        description: 'Piwigo Version'
+        required: true
+        default: '13.6'
+        type: string
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: actions-ci
     env:
-      __TEMPLATE__VERSION: ${{ vars.__TEMPLATE__VERSION }}
-      __TEMPLATE__PWGVERSION: ${{ vars.__TEMPLATE__PWGVERSION }}
+      __TEMPLATE__VERSION: ${{ inputs.version_php }}
+      __TEMPLATE__PWGVERSION: ${{ inputs.version_piwigo }}
     steps:
       - uses: actions/checkout@v3
       - name: Start build script
@@ -24,7 +35,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.PKG_WRITE }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push image
         run: |
            docker push "ghcr.io/kipjr/docker-piwigo:php-apache-${__TEMPLATE__VERSION}"
