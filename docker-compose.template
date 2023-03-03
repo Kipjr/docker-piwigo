@@ -61,9 +61,6 @@ services:
     hostname: php
     pull_policy: always
     image: ghcr.io/kipjr/docker-piwigo:php-apache-$VERSION_PHP-$VERSION_PIWIGO
-    build:
-      context: src
-      dockerfile: Dockerfile   
     depends_on:
       - piwigo.db
     ports:
