@@ -60,7 +60,7 @@ services:
     container_name: piwigo.php
     hostname: php
     pull_policy: always
-    image: ghcr.io/kipjr/docker-piwigo:php-apache-$__TEMPLATE__VERSION-$__TEMPLATE__PWGVERSION
+    image: ghcr.io/kipjr/docker-piwigo:php-apache-$VERSION_PHP-$VERSION_PIWIGO
     build:
       context: src
       dockerfile: Dockerfile   
