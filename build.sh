@@ -69,7 +69,7 @@ cd "$root"/src
 docker tag ${target}/php-apache:${version} ghcr.io/${target}/docker-piwigo:php-apache-${version}
 
 ## build image with piwigo inside
-docker build -f Dockerfile --build-arg phpversion=${version} -t "ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}" . | tee -a $root/dockerbuild.log
+docker build -f Dockerfile --build-arg phpversion=${version} phpversion=${pwgversion} -t "ghcr.io/${target}/docker-piwigo:php-apache-${version}-${pwgversion}" . | tee -a $root/dockerbuild.log
 
 ######
 #
