@@ -54,7 +54,7 @@ services:
     command: --loglevel debug
     networks:
       - net
-
+    
   #PHP Service
   piwigo.php:
     container_name: piwigo.php
@@ -115,6 +115,34 @@ services:
     networks:
       - net
 
+      
+#composer
+  piwigo.composer:
+    image: composer:latest
+    environment:
+      - COMPOSER_CACHE_DIR=/app/.cache/composer
+    volumes:
+      - phpdata:/app
+    restart: never
+    profiles:
+      - testing
+    networks:
+      - net
+      
+  #phpunit
+  piwigo.phpunit:
+    image: php:$VERSION_PHP-cli
+    restart: never
+    volumes:
+      - phpdata:/app
+      - pwgdata:/piwigo
+    working_dir: /app
+    entrypoint: vendor/bin/phpunit
+    profiles:
+      - testing
+    networks:
+      - net      
+
 volumes:
   dbdata:
     driver: local
@@ -124,7 +152,9 @@ volumes:
     driver: local
   ldapdata:
     driver: local
-
+  phpdata:
+    driver: local
+    
 networks:
   net:
     driver: bridge
