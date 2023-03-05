@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "Running $0"
 VERSION_PHP=${1-8.1}
 VERSION_PIWIGO=${2-13.6}
 declare -x VERSION_PHP
@@ -20,7 +20,7 @@ if [ -z "$(git config --get remote.origin.url)" ]; then
     git clone https://github.com/Kipjr/docker-piwigo docker-piwigo
     REPOPATH="docker-piwigo"
 else
-    echo "Already in repo $(git config --get  remote.origin.url)"
+    echo -e "Already in repo $(git config --get  remote.origin.url)\n"
     REPOPATH="."
 fi
 
@@ -34,16 +34,16 @@ else
     # no local image found
     echo "Building image: kipjr/docker-piwigo:php-apache-$VERSION_PHP-$VERSION_PIWIGO"
     ./build.sh "$VERSION_PHP" "$VERSION_PIWIGO"
-
+    
     echo "Login to GitHub Container Registry"
     docker login ghcr.io
 
     echo "Push PHP image"
     docker push "ghcr.io/kipjr/docker-piwigo:php-apache-$VERSION_PHP"
 
-    echo "Push PHP/Piwigo image"
+    echo "Push PHP/Piwigo image" 
     docker push "ghcr.io/kipjr/docker-piwigo:php-apache-$VERSION_PHP-$VERSION_PIWIGO"
-
+    
     else
     # local image found
     echo "Found local image:"
@@ -78,5 +78,7 @@ fi
 
 echo "Start containers"
 cd $REPOPATH || return
-docker-compose up -d
+docker-compose up -d 
 cd "$ROOTPATH" || return
+
+echo -e "Exiting $0\n"
