@@ -3,7 +3,7 @@ x-variables:
   - &DB_ROOT_PASSWORD "$PASSWORD_DB_ROOT"
   - &DB_DATABASE "pwg"
   - &DB_USERNAME "pwg"
-  - &DB_PASSWORD "pwg"
+  - &DB_PASSWORD "$PASSWORD_DB_PWG"
   - &DB_PREFIX "pwg_"
   - &PWG_ADMIN_USERNAME "admin"
   - &PWG_ADMIN_PASSWORD "$PASSWORD_PIWIGO_ADMIN"
@@ -118,6 +118,8 @@ services:
       
 #composer
   piwigo.composer:
+    container_name: piwigo.composer
+    hostname: piwigo.composer
     image: composer:latest
     environment:
       - COMPOSER_CACHE_DIR=/app/.cache/composer
@@ -131,6 +133,8 @@ services:
       
   #phpunit
   piwigo.phpunit:
+    container_name: piwigo.phpunit
+    hostname: piwigo.phpunit
     image: php:$VERSION_PHP-cli
     restart: never
     volumes:
