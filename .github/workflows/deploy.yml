@@ -1,21 +1,23 @@
 name: Deploy
 on:
-  # push:
-  #  branches:
-  #    - dev
-  # schedule:
-  #   - cron: '0 6 * * 6' # every 30 minutes
+  push:
+    branches:
+      - dev
+    paths:
+      - '**'
+      - '!.github/workflows/*'
+      - '!README.md'
   workflow_dispatch:
     inputs:
       version_php:
-        description: 'PHP Version'
+        description: "PHP Version"
         required: true
-        default: '8.1'
+        default: "8.1"
         type: string
       version_piwigo:
-        description: 'Piwigo Version'
+        description: "Piwigo Version"
         required: true
-        default: '13.6'
+        default: "13.6"
         type: string
 
 jobs:
@@ -25,9 +27,19 @@ jobs:
       contents: read
       packages: write
     steps:
+      - name: Set environment variables (workflow)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "VERSION_PHP=${{ inputs.version_php }}" >> $GITHUB_ENV
+          echo "VERSION_PIWIGO=${{ inputs.version_piwigo }}" >> $GITHUB_ENV
+      - name: Set environment variables (environment)
+        if: github.event_name != 'workflow_dispatch' || ( github.event.inputs.version_php == '' &&  github.event.inputs.version_piwigo == '' )
+        run: |
+          echo "VERSION_PHP=${{ vars.VERSION_PHP }}" >> $GITHUB_ENV
+          echo "VERSION_PIWIGO=${{ vars.VERSION_PIWIGO }}" >> $GITHUB_ENV    
       - uses: actions/checkout@v3
       - name: Start build script
-        run: ./build.sh ${{ inputs.version_php }} ${{ inputs.version_piwigo }}
+        run: ./build.sh $VERSION_PHP $VERSION_PIWIGO
         shell: bash
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
@@ -35,7 +47,9 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push image
+      - name: Push PHP image
         run: |
-           docker push "ghcr.io/kipjr/docker-piwigo:php-apache-${{ inputs.version_php }}"
-           docker push "ghcr.io/kipjr/docker-piwigo:php-apache-${{ inputs.version_php }}-${{ inputs.version_piwigo }}" 
+          docker push "ghcr.io/kipjr/docker-piwigo:php-apache-$VERSION_PHP"
+      - name: Push PHP/Piwigo image
+        run: |
+          docker push "ghcr.io/kipjr/docker-piwigo:php-apache-$VERSION_PHP-$VERSION_PIWIGO"
