@@ -17,7 +17,7 @@ on:
       version_piwigo:
         description: "Piwigo Version"
         required: true
-        default: "13.6"
+        default: "13.6.0"
         type: string
 
 jobs:
