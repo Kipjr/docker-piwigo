@@ -44,9 +44,6 @@ jobs:
           echo "VERSION_PHP=${{ vars.VERSION_PHP }}" >> $GITHUB_ENV
           echo "VERSION_PIWIGO=${{ vars.VERSION_PIWIGO }}" >> $GITHUB_ENV    
       - uses: actions/checkout@v3
-      - name: Start build script
-        run: ./build.sh $VERSION_PHP $VERSION_PIWIGO
-        shell: bash
         
      # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
