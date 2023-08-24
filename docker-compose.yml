@@ -1,15 +1,3 @@
-x-variables:
-  - &DB_HOST "db"
-  - &DB_ROOT_PASSWORD "$PASSWORD_DB_ROOT"
-  - &DB_DATABASE "pwg"
-  - &DB_USERNAME "pwg"
-  - &DB_PASSWORD "$PASSWORD_DB_PWG"
-  - &DB_PREFIX "pwg_"
-  - &PWG_ADMIN_USERNAME "admin"
-  - &PWG_ADMIN_PASSWORD "$PASSWORD_PIWIGO_ADMIN"
-  - &PWG_ADMIN_MAIL "noreply@domain.tld"
-
-
 volumes:
   dbdata:
     driver: local
@@ -22,7 +10,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 192.168.8.128/26 #192.168.8.57 - 192.168.8.62(bc:63)
+        - subnet: ${PWG_NET:-192.168.8.128/26}
 
 
 services:
@@ -33,10 +21,10 @@ services:
     image: "yobasystems/alpine-mariadb:latest"
     environment:
       TZ: "Europe/Amsterdam"
-      MYSQL_ROOT_PASSWORD: *DB_ROOT_PASSWORD
-      MYSQL_DATABASE: *DB_DATABASE
-      MYSQL_USER: *DB_USERNAME
-      MYSQL_PASSWORD: *DB_PASSWORD
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-db}
+      MYSQL_DATABASE: ${DB_DATABASE:-pwg}
+      MYSQL_USER: ${DB_USERNAME:-pwg}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-pwg}
     volumes:
       - dbdata:/var/lib/mysql/ # allows you to stop and restart the db service without losing data
     restart: "unless-stopped"
@@ -47,8 +35,8 @@ services:
   piwigo.php:
     container_name: piwigo.php
     hostname: php
-    pull_policy: always
-    image: ghcr.io/kipjr/docker-piwigo:php-apache-$VERSION_PHP-$VERSION_PIWIGO
+    #pull_policy: missing
+    image: ghcr.io/kipjr/docker-piwigo:php-apache-${VERSION_PHP:-8.2}-${VERSION_PIWIGO:-13.8.0}
     depends_on:
       - piwigo.db
     ports:
@@ -56,14 +44,14 @@ services:
     restart: "unless-stopped"
     environment:
       TZ: "Europe/Amsterdam"
-      PWG_DB_HOST: *DB_HOST
-      PWG_DB_BASE: *DB_DATABASE
-      PWG_DB_USER: *DB_USERNAME
-      PWG_DB_PASSWORD: *DB_PASSWORD
-      PWG_DB_PREFIX: *DB_PREFIX
-      PWG_ADMIN_USERNAME: *PWG_ADMIN_USERNAME
-      PWG_ADMIN_PASSWORD: *PWG_ADMIN_PASSWORD
-      PWG_ADMIN_EMAIL: *PWG_ADMIN_MAIL
+      PWG_DB_HOST: ${DB_HOST:-db}
+      PWG_DB_BASE: ${DB_DATABASE:-pwg}
+      PWG_DB_USER: ${DB_USERNAME:-pwg}
+      PWG_DB_PASSWORD: ${DB_PASSWORD:-pwg}
+      PWG_DB_PREFIX: ${DB_PREFIX:-pwg_}
+      PWG_ADMIN_USERNAME: ${PWG_ADMIN_USERNAME:-admin}
+      PWG_ADMIN_PASSWORD: ${PWG_ADMIN_PASSWORD}
+      PWG_ADMIN_EMAIL: ${PWG_ADMIN_EMAIL:-noreply@domain.tld}
     volumes:
       - pwgdata:/app
     networks:
@@ -77,11 +65,13 @@ services:
     profiles:
       - debug
     environment:
-      PMA_HOST: *DB_HOST
+      PMA_HOST: ${DB_HOST:-db}
       PMA_USER: root
-      PMA_PASSWORD: *DB_ROOT_PASSWORD
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD:-db}
     ports:
-      - "7081:80"
+      - target: 80
+        host_ip: ${PWG_HOST_IP:-0.0.0.0}
+        published: ${PWG_PORT:-7081}
     restart: "unless-stopped"
     networks:
       - net
