@@ -37,6 +37,11 @@ services:
     hostname: php
     #pull_policy: missing
     image: ghcr.io/kipjr/docker-piwigo:php-apache-${VERSION_PHP:-8.2}-${VERSION_PIWIGO:-13.8.0}
+    build:
+      context: src
+      args:
+        - phpversion=${VERSION_PHP:-8.2}
+        - pwgversion=${VERSION_PIWIGO:-13.8.0}
     depends_on:
       - piwigo.db
     ports:
