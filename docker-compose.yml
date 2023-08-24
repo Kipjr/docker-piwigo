@@ -74,9 +74,7 @@ services:
       PMA_USER: root
       PMA_PASSWORD: ${DB_ROOT_PASSWORD:-db}
     ports:
-      - target: 80
-        host_ip: ${PWG_HOST_IP:-0.0.0.0}
-        published: ${PWG_PORT:-7081}
+      - "${PWG_HOST_IP:-0.0.0.0}:${PWG_PORT:-7081}:80"
     restart: "unless-stopped"
     networks:
       - net
