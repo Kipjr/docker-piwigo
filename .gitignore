@@ -1,4 +1,3 @@
-base
-*.yml
+.env
 ldap_login
 
