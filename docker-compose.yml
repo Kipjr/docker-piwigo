@@ -40,8 +40,8 @@ services:
     build:
       context: src
       args:
-        - phpversion=${VERSION_PHP:-8.2}
-        - pwgversion=${VERSION_PIWIGO:-13.8.0}
+        - PHPVERSION=${VERSION_PHP:-8.2}
+        - PWGVERSION=${VERSION_PIWIGO:-13.8.0}
     depends_on:
       - piwigo.db
     ports:
@@ -55,7 +55,7 @@ services:
       PWG_DB_PASSWORD: ${DB_PASSWORD:-pwg}
       PWG_DB_PREFIX: ${DB_PREFIX:-pwg_}
       PWG_ADMIN_USERNAME: ${PWG_ADMIN_USERNAME:-admin}
-      PWG_ADMIN_PASSWORD: ${PWG_ADMIN_PASSWORD}
+      PWG_ADMIN_PASSWORD: ${PWG_ADMIN_PASSWORD:-password}
       PWG_ADMIN_EMAIL: ${PWG_ADMIN_EMAIL:-noreply@domain.tld}
     volumes:
       - pwgdata:/app
