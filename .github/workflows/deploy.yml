@@ -89,7 +89,6 @@ jobs:
         with:
           load: true
           builder: ${{ steps.buildx.outputs.name }}
-          file: ./Dockerfile
           context: src
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache          
@@ -101,7 +100,6 @@ jobs:
         uses: docker/build-push-action@v4.1.1
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          file: ./Dockerfile
           context: src
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache          
