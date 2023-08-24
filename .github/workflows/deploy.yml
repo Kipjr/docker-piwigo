@@ -82,9 +82,9 @@ jobs:
         run: COMPOSE_DOCKER_CLI_BUILD=1 docker-compose build piwigo.php
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
-      
+
       - name: Build and push Docker PHP-MW image
-        id: build-and-push_php-apache_mw
+        id: build-php-apache_mw
         uses: docker/build-push-action@v4.1.1
         with:
           load: true
@@ -93,6 +93,18 @@ jobs:
           context: src
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache          
-          push: ${{ github.event_name != 'pull_request' }}
+          tags: php-apache-${{ env.VERSION_PHP }}-${{ env.VERSION_PIWIGO }}
+          labels: php-apache-${{ env.VERSION_PHP }}-${{ env.VERSION_PIWIGO }}
+          
+      - name: Build and push Docker PHP-MW image
+        id: build-and-push_php-apache_mw
+        uses: docker/build-push-action@v4.1.1
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          file: ./Dockerfile
+          context: src
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache          
+          push: true
           tags: php-apache-${{ env.VERSION_PHP }}-${{ env.VERSION_PIWIGO }}
           labels: php-apache-${{ env.VERSION_PHP }}-${{ env.VERSION_PIWIGO }}
