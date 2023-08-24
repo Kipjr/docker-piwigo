@@ -19,7 +19,13 @@ on:
         required: true
         default: "13.6.0"
         type: string
-
+        
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -41,15 +47,57 @@ jobs:
       - name: Start build script
         run: ./build.sh $VERSION_PHP $VERSION_PIWIGO
         shell: bash
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        
+     # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2.2.0
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push PHP image
-        run: |
-          docker push "ghcr.io/kipjr/docker-piwigo:php-apache-$VERSION_PHP"
-      - name: Push PHP/Piwigo image
-        run: |
-          docker push "ghcr.io/kipjr/docker-piwigo:php-apache-$VERSION_PHP-$VERSION_PIWIGO"
+          
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata PHP
+        id: meta_php
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=php-apache-${{ env.VERSION_PHP }}
+
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata PHP-MW
+        id: meta_php_mw
+        uses: docker/metadata-action@v4.6.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=php-apache-${{ env.VERSION_PHP }}-${{ env.VERSION_PIWIGO }}
+            
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker PHP image 
+        id: build-and-push_php-apache
+        uses: docker/build-push-action@v4.1.1
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: php-apache-${{ env.VERSION_PHP }}
+          labels: php-apache-${{ env.VERSION_PHP }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      - name: Build and push Docker PHP-MW image
+        id: build-and-push_php-apache_mw
+        uses: docker/build-push-action@v4.1.1
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: php-apache-${{ env.VERSION_PHP }}-${{ env.VERSION_PIWIGO }}
+          labels: php-apache-${{ env.VERSION_PHP }}-${{ env.VERSION_PIWIGO }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
