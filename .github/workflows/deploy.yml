@@ -12,12 +12,12 @@ on:
       version_php:
         description: "PHP Version"
         required: true
-        default: "8.1"
+        default: "8.2"
         type: string
       version_piwigo:
         description: "Piwigo Version"
         required: true
-        default: "13.6.0"
+        default: "13.8.0"
         type: string
         
 env:
@@ -48,7 +48,11 @@ jobs:
         run: ./build.sh $VERSION_PHP $VERSION_PIWIGO
         shell: bash
         
-     # Login against a Docker registry except on PR
+     # Workaround: https://github.com/docker/build-push-action/issues/461
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v2.7.0
+
+      # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into registry ${{ env.REGISTRY }}
         if: github.event_name != 'pull_request'
@@ -70,24 +74,14 @@ jobs:
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata PHP-MW
-        id: meta_php_mw
+      - name: Extract Docker metadata
+        id: meta
         uses: docker/metadata-action@v4.6.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=php-apache-${{ env.VERSION_PHP }}-${{ env.VERSION_PIWIGO }}
             
-      # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
-      - name: Build and push Docker PHP image 
-        id: build-and-push_php-apache
-        uses: docker/build-push-action@v4.1.1
-        with:
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: php-apache-${{ env.VERSION_PHP }}
-          labels: php-apache-${{ env.VERSION_PHP }}
-
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker PHP-MW image
