@@ -1,8 +1,10 @@
 volumes:
+  config:
+    driver: local
+  gallery:
+    driver: local 
   dbdata:
-    driver: local
-  pwgdata:
-    driver: local
+    driver: local 
 
 networks:
   net:
@@ -35,12 +37,10 @@ services:
   piwigo.php:
     container_name: piwigo.php
     hostname: php
-    #pull_policy: missing
-    image: ghcr.io/kipjr/docker-piwigo:php-apache-${VERSION_PHP:-8.2}-${VERSION_PIWIGO:-13.8.0}
+    image: ghcr.io/kipjr/docker-piwigo:${VERSION_PIWIGO:-13.8.0}
     build:
-      context: src
-      args:
-        - PHPVERSION=${VERSION_PHP:-8.2}
+     context: src
+     args:
         - PWGVERSION=${VERSION_PIWIGO:-13.8.0}
     depends_on:
       - piwigo.db
@@ -58,7 +58,8 @@ services:
       PWG_ADMIN_PASSWORD: ${PWG_ADMIN_PASSWORD:-password}
       PWG_ADMIN_EMAIL: ${PWG_ADMIN_EMAIL:-noreply@domain.tld}
     volumes:
-      - pwgdata:/app
+      - ./config:/config
+      - gallery:/gallery
     networks:
       - net
 
