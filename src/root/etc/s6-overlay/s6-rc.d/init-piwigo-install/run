@@ -6,6 +6,8 @@ if [ $(grep -q 'fastcgi_buffers' /config/nginx/site-confs/default.conf) ];then
     sed -E 's/^\}$/\n    fastcgi_buffers 16 16k;\n    fastcgi_buffer_size 32k;\n}/g' -i /config/nginx/site-confs/default.conf;
 fi
 
+sleep 5s
+
 # Auto install
 /usr/bin/curl -f -s -v \
  --data-raw "language=en_GB&dbhost=${PWG_DB_HOST}&dbuser=${PWG_DB_USER}&dbpasswd=${PWG_DB_PASSWORD}&dbname=${PWG_DB_BASE}&prefix=${PWG_DB_PREFIX}&admin_name=${PWG_ADMIN_USERNAME}&admin_pass1=${PWG_ADMIN_PASSWORD}&admin_pass2=${PWG_ADMIN_PASSWORD}&admin_mail=${PWG_ADMIN_EMAIL}&install=Start+installation" \
