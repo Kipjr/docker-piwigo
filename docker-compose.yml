@@ -2,8 +2,10 @@ volumes:
   config:
     driver: local
   gallery:
-    driver: local 
-  dbdata:
+    driver: local
+  initdb:
+    driver: local
+  db:
     driver: local 
 
 networks:
@@ -12,7 +14,7 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: ${PWG_NET:-192.168.8.128/26}
+        - subnet: ${NET_SUBNET:-192.168.8.128/26}
 
 
 services:
@@ -20,16 +22,17 @@ services:
   piwigo.db:
     container_name: piwigo.db
     hostname: db
-    image: "yobasystems/alpine-mariadb:latest"
+    image: 'mariadb:10'
     environment:
       TZ: "Europe/Amsterdam"
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-db}
-      MYSQL_DATABASE: ${DB_DATABASE:-pwg}
-      MYSQL_USER: ${DB_USERNAME:-pwg}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-pwg}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-db}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-pwg}
+      MYSQL_USER: ${MYSQL_USER:-pwg}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pwg}
     volumes:
-      - dbdata:/var/lib/mysql/ # allows you to stop and restart the db service without losing data
-    restart: "unless-stopped"
+      - db:/var/lib/mysql/
+      - initdb:/docker-entrypoint-initdb.d
+    restart: "always"
     networks:
       - net
 
@@ -45,20 +48,20 @@ services:
     depends_on:
       - piwigo.db
     ports:
-      - 7080:80
+      - "${PWG_HOSTPORT:-7080}:80"
     restart: "unless-stopped"
     environment:
       TZ: "Europe/Amsterdam"
-      PWG_DB_HOST: ${DB_HOST:-db}
-      PWG_DB_BASE: ${DB_DATABASE:-pwg}
-      PWG_DB_USER: ${DB_USERNAME:-pwg}
-      PWG_DB_PASSWORD: ${DB_PASSWORD:-pwg}
+      PWG_DB_HOST: ${MYSQL_HOST:-db}
+      PWG_DB_BASE: ${MYSQL_DATABASE:-pwg}
+      PWG_DB_USER: ${MYSQL_USER:-pwg}
+      PWG_DB_PASSWORD: ${MYSQL_PASSWORD:-pwg}
       PWG_DB_PREFIX: ${DB_PREFIX:-pwg_}
       PWG_ADMIN_USERNAME: ${PWG_ADMIN_USERNAME:-admin}
       PWG_ADMIN_PASSWORD: ${PWG_ADMIN_PASSWORD:-password}
       PWG_ADMIN_EMAIL: ${PWG_ADMIN_EMAIL:-noreply@domain.tld}
     volumes:
-      - ./config:/config
+      - config:/config
       - gallery:/gallery
     networks:
       - net
@@ -71,12 +74,11 @@ services:
     profiles:
       - debug
     environment:
-      PMA_HOST: ${DB_HOST:-db}
+      PMA_HOST: ${MYSQL_HOST:-db}
       PMA_USER: root
-      PMA_PASSWORD: ${DB_ROOT_PASSWORD:-db}
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:-db}
     ports:
-      - "${PWG_HOST_IP:-0.0.0.0}:${PWG_PORT:-7081}:80"
+      - "${PMA_HOSTPORT:-7081}:80"
     restart: "unless-stopped"
     networks:
       - net
-
