@@ -59,6 +59,6 @@ jobs:
         run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose build piwigo.php
       
       - name: Push piwigo.php
-        run: docker-compose push
+        run: docker compose push
 
 
