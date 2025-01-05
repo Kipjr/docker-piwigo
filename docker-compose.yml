@@ -44,7 +44,7 @@ services:
     build:
      context: src
      args:
-        - PWGVERSION=${VERSION_PIWIGO:-15.3.0}
+        - VERSION_PIWIGO=${VERSION_PIWIGO:-15.3.0}
     depends_on:
       - piwigo.db
     ports:
