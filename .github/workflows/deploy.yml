@@ -17,7 +17,7 @@ on:
       version_piwigo:
         description: "Piwigo Version"
         required: true
-        default: "14.4.0"
+        default: "15.3.0"
         type: string
         
 env:
@@ -56,7 +56,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build piwigo.php
-        run: COMPOSE_DOCKER_CLI_BUILD=1 docker-compose build piwigo.php
+        run: COMPOSE_DOCKER_CLI_BUILD=1 docker compose build piwigo.php
       
       - name: Push piwigo.php
         run: docker-compose push
