@@ -17,7 +17,7 @@ on:
       version_piwigo:
         description: "Piwigo Version"
         required: true
-        default: "14.4.0"
+        default: "15.3.0"
         type: string
         
 env:
