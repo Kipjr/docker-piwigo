@@ -14,8 +14,8 @@
 - PHP:
   - 8.2+
 - Piwigo: 
-  - 14.4+
+  - 15.3+
 
 #### Usage
 
-- `docker pull ghcr.io/kipjr/docker-piwigo:14.4.0`
+- `docker pull ghcr.io/kipjr/docker-piwigo:15.3.0`
