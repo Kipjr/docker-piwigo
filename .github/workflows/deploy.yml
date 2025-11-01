@@ -12,12 +12,12 @@ on:
       version_php:
         description: "PHP Version"
         required: true
-        default: "8.2"
+        default: "8.4"
         type: string
       version_piwigo:
         description: "Piwigo Version"
         required: true
-        default: "15.3.0"
+        default: "15.7.0"
         type: string
         
 env:
