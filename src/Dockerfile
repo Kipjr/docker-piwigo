@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.description Image for Piwigo Photoalbum software
 RUN \
   echo "**** install packages ****" && \
   apk add --no-cache \
-    php83-phar && \
+    php84-phar && \
   echo "**** cleanup ****" && \
   rm -rf \
     /tmp/*
