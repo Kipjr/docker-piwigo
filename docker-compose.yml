@@ -40,11 +40,11 @@ services:
   piwigo.php:
     container_name: piwigo.php
     hostname: php
-    image: ghcr.io/kipjr/docker-piwigo:${VERSION_PIWIGO:-15.3.0}
+    image: ghcr.io/kipjr/docker-piwigo:${VERSION_PIWIGO:-16.1.0}
     build:
      context: src
      args:
-        - VERSION_PIWIGO=${VERSION_PIWIGO:-15.3.0}
+        - VERSION_PIWIGO=${VERSION_PIWIGO:-16.1.0}
     depends_on:
       - piwigo.db
     ports:
