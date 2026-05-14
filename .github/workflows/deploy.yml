@@ -9,15 +9,15 @@ on:
       - '!README.md'
   workflow_dispatch:
     inputs:
-      version_php:
+      php_version:
         description: "PHP Version"
         required: true
-        default: "8.4"
+        default: "84"
         type: string
-      version_piwigo:
+      piwigo_version:
         description: "Piwigo Version"
         required: true
-        default: "16.1.0"
+        default: "16.4.0"
         type: string
         
 env:
@@ -36,13 +36,13 @@ jobs:
       - name: Set environment variables (workflow)
         if: github.event_name == 'workflow_dispatch'
         run: |
-          echo "VERSION_PHP=${{ inputs.version_php }}" >> $GITHUB_ENV
-          echo "VERSION_PIWIGO=${{ inputs.version_piwigo }}" >> $GITHUB_ENV
+          echo "PHP_VERSION=${{ inputs.php_version }}" >> $GITHUB_ENV
+          echo "PIWIGO_VERSION=${{ inputs.piwigo_version }}" >> $GITHUB_ENV
       - name: Set environment variables (environment)
-        if: github.event_name != 'workflow_dispatch' || ( github.event.inputs.version_php == '' &&  github.event.inputs.version_piwigo == '' )
+        if: github.event_name != 'workflow_dispatch' || ( github.event.inputs.php_version == '' &&  github.event.inputs.piwigo_version == '' )
         run: |
-          echo "VERSION_PHP=${{ vars.VERSION_PHP }}" >> $GITHUB_ENV
-          echo "VERSION_PIWIGO=${{ vars.VERSION_PIWIGO }}" >> $GITHUB_ENV    
+          echo "PHP_VERSION=${{ vars.PHP_VERSION }}" >> $GITHUB_ENV
+          echo "PIWIGO_VERSION=${{ vars.PIWIGO_VERSION }}" >> $GITHUB_ENV    
       - uses: actions/checkout@v3
 
       # Login against a Docker registry except on PR
