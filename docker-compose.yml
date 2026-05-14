@@ -34,7 +34,7 @@ services:
     container_name: piwigo.php
     hostname: php
     # image: piwigo/piwigo:${VERSION_PIWIGO:-latest}
-    image: ghcr.io/kipjr/docker-piwigo:${VERSION_PIWIGO:-latest}
+    image: ghcr.io/kipjr/docker-piwigo:${PIWIGO_VERSION:-latest}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=REVERSE_PROXY"
@@ -49,7 +49,7 @@ services:
      args:
        DEPLOY_ENV: "production"
        PHP_VERSION: "84"
-       VERSION_PIWIGO: "${VERSION_PIWIGO:-16.4.0}"
+       PIWIGO_VERSION: "${VERSION_PIWIGO:-16.4.0}"
     depends_on:
       - piwigo.db
     ports:
