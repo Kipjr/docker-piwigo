@@ -16,7 +16,7 @@ services:
   piwigo.db:
     container_name: piwigo.db
     hostname: db
-    image: mariadb:${VERSION_MARIADB:-lts}
+    image: mariadb:${MARIADB_VERSION:-lts}
     environment:
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MARIADB_DATABASE=${MARIADB_DATABASE:-piwigodb}
