@@ -1,1 +1,2 @@
-/etc/s6-overlay/s6-rc.d/init-piwigo-install/run
+#!/bin/execlineb -P
+/bin/ash -c "/init-piwigo-install.sh"
