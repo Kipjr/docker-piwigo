@@ -19,3 +19,4 @@ RUN \
 
 # copy local files
 COPY --chmod=0755 root/etc/s6-overlay/s6-rc.d/ /etc/s6-overlay/s6-rc.d/
+COPY --chmod=0755 root/init-piwigo-install.sh /init-piwigo-install.sh
