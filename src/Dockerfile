@@ -1,12 +1,18 @@
 # syntax=docker/dockerfile:1
-FROM lscr.io/linuxserver/piwigo:${VERSION_PIWIGO:-16.1.0}
+
+ARG PIWIGO_VERSION="16.4.0"
+FROM ghcr.io/piwigo/piwigo:${PIWIGO_VERSION}
+
+ARG PIWIGO_VERSION
+ARG PHP_VERSION="84"
+
 # set version label
 LABEL org.opencontainers.image.description Image for Piwigo Photoalbum software
 
 RUN \
   echo "**** install packages ****" && \
   apk add --no-cache \
-    php84-phar && \
+    php${PHP_VERSION}-phar php${PHP_VERSION}-ldap && \
   echo "**** cleanup ****" && \
   rm -rf \
     /tmp/*

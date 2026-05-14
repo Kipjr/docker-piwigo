@@ -1,12 +1,7 @@
 volumes:
-  config:
-    driver: local
-  gallery:
-    driver: local
-  initdb:
-    driver: local
+  data:
+  scripts:
   db:
-    driver: local 
 
 networks:
   net:
@@ -18,20 +13,18 @@ networks:
 
 
 services:
-  #MySQL Service
   piwigo.db:
     container_name: piwigo.db
     hostname: db
-    image: 'mariadb:10'
+    image: mariadb:${MARIADB_VERSION:-lts}
     environment:
-      TZ: "Europe/Amsterdam"
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-db}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-pwg}
-      MYSQL_USER: ${MYSQL_USER:-pwg}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-pwg}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE:-piwigodb}
+      - MARIADB_USER=${MARIADB_USER:-piwigodb_user}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD} 
+      - TZ=${TZ:-Europe/Amsterdam}
     volumes:
       - db:/var/lib/mysql/
-      - initdb:/docker-entrypoint-initdb.d
     restart: "always"
     networks:
       - net
@@ -40,29 +33,35 @@ services:
   piwigo.php:
     container_name: piwigo.php
     hostname: php
-    image: ghcr.io/kipjr/docker-piwigo:${VERSION_PIWIGO:-16.1.0}
+    # image: piwigo/piwigo:${VERSION_PIWIGO:-latest}
+    image: ghcr.io/kipjr/docker-piwigo:${PIWIGO_VERSION:-latest}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=REVERSE_PROXY"
+      - "traefik.http.routers.${PROJECT}.rule=Host(`${PROJECT_FQDN}`)"
+      - "traefik.http.routers.${PROJECT}.entrypoints=${PROJECT_ENTRYPOINT}"
+      - "traefik.http.routers.${PROJECT}.tls.certresolver=${PROJECT_CERT_RESOLVER}"
+      - "traefik.http.routers.${PROJECT}.tls.domains[0].main=${PROJECT_DOMAIN_MAIN}"
+      - "traefik.http.routers.${PROJECT}.tls.domains[0].sans=${PROJECT_DOMAIN_SANS}"
+      - "traefik.http.services.${PROJECT}.loadbalancer.server.port=80"
     build:
-     context: src
+     context: ./src
      args:
-        - VERSION_PIWIGO=${VERSION_PIWIGO:-16.1.0}
+       DEPLOY_ENV: "production"
+       PHP_VERSION: "84"
+       PIWIGO_VERSION: "${VERSION_PIWIGO:-16.4.0}"
     depends_on:
       - piwigo.db
     ports:
       - "${PWG_HOSTPORT:-7080}:80"
     restart: "unless-stopped"
     environment:
-      TZ: "Europe/Amsterdam"
-      PWG_DB_HOST: ${MYSQL_HOST:-db}
-      PWG_DB_BASE: ${MYSQL_DATABASE:-pwg}
-      PWG_DB_USER: ${MYSQL_USER:-pwg}
-      PWG_DB_PASSWORD: ${MYSQL_PASSWORD:-pwg}
-      PWG_DB_PREFIX: ${DB_PREFIX:-pwg_}
-      PWG_ADMIN_USERNAME: ${PWG_ADMIN_USERNAME:-admin}
-      PWG_ADMIN_PASSWORD: ${PWG_ADMIN_PASSWORD:-password}
-      PWG_ADMIN_EMAIL: ${PWG_ADMIN_EMAIL:-noreply@domain.tld}
+      - TZ=${TZ:-Europe/Amsterdm}
+      - PIWIGO_UID=${PIWIGO_UID:-1000}
+      - PIWIGO_GID=${PIWIGO_GID:-1000}
     volumes:
-      - config:/config
-      - gallery:/gallery
+      - data:/var/www/html/piwigo/
+      - scripts:/usr/local/bin/scripts/
     networks:
       - net
 
@@ -74,9 +73,9 @@ services:
     profiles:
       - debug
     environment:
-      PMA_HOST: ${MYSQL_HOST:-db}
+      PMA_HOST: ${MARIADB_HOST:-db}
       PMA_USER: root
-      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:-db}
+      PMA_PASSWORD: ${MARIADB_ROOT_PASSWORD:-db}
     ports:
       - "${PMA_HOSTPORT:-7081}:80"
     restart: "unless-stopped"
