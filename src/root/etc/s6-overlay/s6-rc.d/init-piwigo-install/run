@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/bin/execlineb -P
 # shellcheck shell=bash
 
 # Fix for https://github.com/Kipjr/Ldap_Login/issues/129

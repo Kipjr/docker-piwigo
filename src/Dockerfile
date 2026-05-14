@@ -18,4 +18,4 @@ RUN \
     /tmp/*
 
 # copy local files
-COPY root/ /
+COPY --chmod=0755 root/etc/s6-overlay/s6-rc.d/ /etc/s6-overlay/s6-rc.d/
