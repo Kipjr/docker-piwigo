@@ -33,8 +33,8 @@ services:
   piwigo.php:
     container_name: piwigo.php
     hostname: php
-    image: piwigo/piwigo:${VERSION_PIWIGO:-latest}
-    # image: ghcr.io/kipjr/docker-piwigo:${VERSION_PIWIGO:-16.4.0}
+    # image: piwigo/piwigo:${VERSION_PIWIGO:-latest}
+    image: ghcr.io/kipjr/docker-piwigo:${VERSION_PIWIGO:-latest}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=REVERSE_PROXY"
