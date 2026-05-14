@@ -12,7 +12,7 @@ LABEL org.opencontainers.image.description Image for Piwigo Photoalbum software
 RUN \
   echo "**** install packages ****" && \
   apk add --no-cache \
-    php${PHP_VERSION}-phar && \
+    php${PHP_VERSION}-phar php${PHP_VERSION}-ldap && \
   echo "**** cleanup ****" && \
   rm -rf \
     /tmp/*
